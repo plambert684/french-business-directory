@@ -18,6 +18,14 @@ class UnitesLegalesController extends Controller
 
             return response()->json($legalUnits);
 
+        } elseif (request()->header('company')) {
+
+            $company = request()->header('company');
+
+            $legalUnits = \App\Models\unitesLegales::where('denomination_unite_legale', 'like', '%' . $company . '%')->get();
+
+            return response()->json($legalUnits);
+
         } else {
             return response()->json(['error' => 'SIREN header is required'], 400);
         }

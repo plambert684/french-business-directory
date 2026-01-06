@@ -14,62 +14,102 @@ return new class extends Migration
         Schema::create('unites_legales', function (Blueprint $table) {
             $table->id();
 
-            // Identifiant
+            // 0: siren
             $table->string('siren', 9)->index();
 
-            // Diffusion et purge
+            // 1: statutDiffusionUniteLegale
             $table->string('statut_diffusion_unite_legale')->nullable();
+
+            // 2: unitePurgeeUniteLegale
             $table->string('unite_purgee_unite_legale')->nullable();
 
-            // Dates de création et de traitement
+            // 3: dateCreationUniteLegale
             $table->date('date_creation_unite_legale')->nullable();
-            $table->dateTime('date_dernier_traitement_unite_legale')->nullable();
-            $table->date('date_debut')->nullable();
 
-            // Identité physique
+            // 4: sigleUniteLegale
             $table->string('sigle_unite_legale')->nullable();
-            $table->string('sexe_unite_legale', 1)->nullable();
+
+            // 5: sexeUniteLegale (Augmenté à 4 pour gérer [ND])
+            $table->string('sexe_unite_legale', 4)->nullable();
+
+            // 6, 7, 8, 9: prenoms
             $table->string('prenom_1_unite_legale')->nullable();
             $table->string('prenom_2_unite_legale')->nullable();
             $table->string('prenom_3_unite_legale')->nullable();
             $table->string('prenom_4_unite_legale')->nullable();
+
+            // 10: prenomUsuelUniteLegale
             $table->string('prenom_usuel_unite_legale')->nullable();
+
+            // 11: pseudonymeUniteLegale
             $table->string('pseudonyme_unite_legale')->nullable();
-            $table->string('nom_unite_legale')->nullable();
+
+            // 12: identifiantAssociationUniteLegale
+            $table->string('identifiant_association_unite_legale')->nullable();
+
+            // 13: trancheEffectifsUniteLegale
+            $table->string('tranche_effectifs_unite_legale')->nullable();
+
+            // 14: anneeEffectifsUniteLegale
+            $table->integer('annee_effectifs_unite_legale')->nullable();
+
+            // 15: dateDernierTraitementUniteLegale
+            $table->dateTime('date_dernier_traitement_unite_legale')->nullable();
+
+            // 16: nombrePeriodesUniteLegale
+            $table->integer('nombre_periodes_unite_legale')->default(1);
+
+            // 17: categorieEntreprise
+            $table->string('categorie_entreprise')->nullable();
+
+            // 18: anneeCategorieEntreprise
+            $table->integer('annee_categorie_entreprise')->nullable();
+
+            // 19: dateDebut
+            $table->date('date_debut')->nullable();
+
+            // 20: etatAdministratifUniteLegale (Augmenté à 4 pour [ND])
+            $table->string('etat_administratif_unite_legale', 4)->nullable();
+
+            // 21: nomUniteLegale
+            $table->string('nom_unite_legale')->nullable()->index();
+
+            // 22: nomUsageUniteLegale
             $table->string('nom_usage_unite_legale')->nullable();
 
-            // Identité morale
-            $table->string('denomination_unite_legale')->nullable();
+            // 23: denominationUniteLegale
+            $table->string('denomination_unite_legale')->nullable()->index();
+
+            // 24, 25, 26: denominationsUsuelles
             $table->string('denomination_usuelle_1_unite_legale')->nullable();
             $table->string('denomination_usuelle_2_unite_legale')->nullable();
             $table->string('denomination_usuelle_3_unite_legale')->nullable();
-            $table->string('identifiant_association_unite_legale')->nullable();
 
-            // Effectifs et Catégories
-            $table->string('tranche_effectifs_unite_legale')->nullable();
-            $table->integer('annee_effectifs_unite_legale')->nullable();
-            $table->string('categorie_entreprise')->nullable();
-            $table->integer('annee_categorie_entreprise')->nullable();
-
-            // Informations juridiques et administratives
-            $table->integer('nombre_periodes_unite_legale')->default(1);
-            $table->string('etat_administratif_unite_legale', 1)->nullable();
+            // 27: categorieJuridiqueUniteLegale
             $table->string('categorie_juridique_unite_legale', 4)->nullable();
+
+            // 28: activitePrincipaleUniteLegale
+            $table->string('activite_principale_unite_legale', 6)->nullable();
+
+            // 29: nomenclatureActivitePrincipaleUniteLegale
+            $table->string('nomenclature_activite_principale_unite_legale')->nullable();
+
+            // 30: nicSiegeUniteLegale
             $table->string('nic_siege_unite_legale', 5)->nullable();
 
-            // Code NAF
-            $table->string('activite_principale_unite_legale', 6)->nullable();
-            $table->string('nomenclature_activite_principale_unite_legale')->nullable();
+            // 31: economieSocialeSolidaireUniteLegale
+            $table->string('economie_sociale_solidaire_unite_legale', 4)->nullable();
+
+            // 32: societeMissionUniteLegale
+            $table->string('societe_mission_unite_legale', 4)->nullable();
+
+            // 33: caractereEmployeurUniteLegale
+            $table->string('caractere_employeur_unite_legale', 4)->nullable();
+
+            // 34: activitePrincipaleNAF25UniteLegale
             $table->string('activite_principale_naf_25_unite_legale', 6)->nullable();
 
-            $table->string('economie_sociale_solidaire_unite_legale', 1)->nullable();
-            $table->string('societe_mission_unite_legale', 1)->nullable();
-            $table->string('caractere_employeur_unite_legale', 1)->nullable();
-
             $table->timestamps();
-
-            $table->index('nom_unite_legale');
-            $table->index('denomination_unite_legale');
         });
     }
 

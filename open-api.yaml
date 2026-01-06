@@ -1,0 +1,116 @@
+openapi: 3.0.3
+info:
+  title: French Business Directory API
+  description: API pour consulter les établissements et les unités légales via SIREN.
+  version: 1.0.0
+servers:
+  - url: http://localhost/api
+    description: Serveur de développement local
+paths:
+  /etablissements:
+    get:
+      summary: Liste les établissements
+      description: Récupère les établissements associés à un numéro SIREN fourni dans les en-têtes.
+      parameters:
+        - name: siren
+          in: header
+          required: true
+          description: Le numéro SIREN (9 chiffres)
+          schema:
+            type: string
+            pattern: '^[0-9]{9}$'
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Etablissement'
+        '400':
+          description: En-tête SIREN manquant
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: SIREN header is required
+
+  /unites_legales:
+    get:
+      summary: Liste les unités légales
+      description: Récupère les unités légales associées à un numéro SIREN fourni dans les en-têtes.
+      parameters:
+        - name: siren
+          in: header
+          required: true
+          description: Le numéro SIREN (9 chiffres)
+          schema:
+            type: string
+            pattern: '^[0-9]{9}$'
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UniteLegale'
+        '400':
+          description: En-tête SIREN manquant
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: SIREN header is required
+
+components:
+  schemas:
+    Etablissement:
+      type: object
+      properties:
+        id:
+          type: integer
+        siren:
+          type: string
+        nic:
+          type: string
+        siret:
+          type: string
+        date_debut:
+          type: string
+          format: date
+        etat_administratif:
+          type: string
+        enseigne_1:
+          type: string
+        activite_principale:
+          type: string
+
+    UniteLegale:
+      type: object
+      properties:
+        id:
+          type: integer
+        siren:
+          type: string
+        denomination_unite_legale:
+          type: string
+        nom_unite_legale:
+          type: string
+        prenom_1_unite_legale:
+          type: string
+        date_creation_unite_legale:
+          type: string
+          format: date
+        categorie_entreprise:
+          type: string
+        activite_principale_unite_legale:
+          type: string
