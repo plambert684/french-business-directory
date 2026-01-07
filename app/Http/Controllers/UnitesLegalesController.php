@@ -27,7 +27,7 @@ class UnitesLegalesController extends Controller
             return response()->json($legalUnits);
 
         } else {
-            return response()->json(['error' => 'SIREN header is required'], 400);
+            return response()->json(['error' => 'Missing parameters header is required'], 400);
         }
     }
 

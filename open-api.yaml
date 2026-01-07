@@ -15,7 +15,7 @@ paths:
         - name: siren
           in: header
           required: true
-          description: Le numéro SIREN (9 chiffres)
+          description: Le numéro SIREN
           schema:
             type: string
             pattern: '^[0-9]{9}$'
@@ -42,15 +42,24 @@ paths:
   /unites_legales:
     get:
       summary: Liste les unités légales
-      description: Récupère les unités légales associées à un numéro SIREN fourni dans les en-têtes.
+      description: >
+        Récupère les unités légales.
+        **Attention :** Vous devez fournir soit le `siren`, soit le `company`, mais pas les deux simultanément.
       parameters:
         - name: siren
           in: header
-          required: true
+          required: false
           description: Le numéro SIREN (9 chiffres)
           schema:
             type: string
             pattern: '^[0-9]{9}$'
+        - name: company
+          in: header
+          required: false
+          description: Le nom de l'entreprise pour la recherche
+          schema:
+            type: string
+            pattern: '^[A-Za-zÀ-ÖØ-öø-ÿ \'-]{2,100}$'
       responses:
         '200':
           description: Succès
@@ -61,7 +70,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/UniteLegale'
         '400':
-          description: En-tête SIREN manquant
+          description: Erreur de validation (Paramètres manquants ou mutuellement exclusifs)
           content:
             application/json:
               schema:
@@ -69,7 +78,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: SIREN header is required
+                    example: "Vous devez fournir soit le header 'siren', soit le header 'company', mais pas les deux."
 
 components:
   schemas:
