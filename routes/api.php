@@ -22,7 +22,13 @@
             ]);
         }
 
-        $token = $user->createToken($request->token_name, ['check-status', 'get-establishments', 'get-legal-units']);
+        $token = $user->createToken($request->token_name,
+            [
+                'check-status',
+                'get-establishments',
+                'get-legal-units'
+            ]
+        );
 
         return ['token' => $token->plainTextToken];
     });

@@ -11,16 +11,34 @@ class EtablissementsController extends Controller
      */
     public function index()
     {
+
+        $requestHistory = new \App\Models\RequestsHistory();
+
         if(request()->header('siren')) {
             $siren = request()->header('siren');
 
             $establishments = \App\Models\etablissementsHistorique::searchBySiren($siren);
+
+            //Save request and response to history
+            $requestHistory->endpoint = request()->path();
+            $requestHistory->method = request()->method();
+            $requestHistory->ip_address = request()->ip();
+            $requestHistory->user_agent = request()->header('User-Agent');
+            $requestHistory->request_headers = json_encode(request()->headers->all());
+            $requestHistory->request_body = json_encode(request()->all());
+            $requestHistory->response_status = 200;
+            $requestHistory->response_body = $establishments->toJson();
+            $requestHistory->user_id = auth()->check() ? auth()->id() : null;
+
+            $requestHistory->save();
+
 
             return response()->json($establishments);
 
         } else {
             return response()->json(['error' => 'SIREN header is required'], 400);
         }
+
     }
 
     /**
