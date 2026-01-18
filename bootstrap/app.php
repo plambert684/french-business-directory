@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
         ]);
+        $middleware->api(append: [
+            \App\Http\Middleware\ForceJsonResponse::class,
+        ]);
     })
     ->withMiddleware(function (Middleware $middleware): void {
         //

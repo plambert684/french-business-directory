@@ -1,27 +1,76 @@
 openapi: 3.0.3
 info:
   title: French Business Directory API
-  description: API pour consulter les établissements et les unités légales via SIREN.
+  description: API pour consulter les entreprises et établissements du répertoire SIRENE.
   version: 1.0.0
 servers:
-  - url: http://localhost/api
-    description: Serveur de développement local
+  - url: /api
+    description: Serveur API local
+
 paths:
-  /etablissements:
+  /tokens/create:
+    post:
+      summary: Créer un jeton d'accès
+      operationId: createToken
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - token_name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: secret123
+                token_name:
+                  type: string
+                  example: my-token
+      responses:
+        '201':
+          description: Jeton créé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: 1|abcdef123456
+        '401':
+          description: Identifiants invalides
+        '422':
+          description: Erreur de validation
+
+  /etablissements/{siren}:
     get:
-      summary: Liste les établissements
-      description: Récupère les établissements associés à un numéro SIREN fourni dans les en-têtes.
+      summary: Liste des établissements par SIREN
+      operationId: getEtablissementsBySiren
+      tags:
+        - Etablissements
+      security:
+        - bearerAuth: []
       parameters:
         - name: siren
-          in: header
+          in: path
           required: true
-          description: Le numéro SIREN
+          description: Le numéro SIREN (9 chiffres)
           schema:
             type: string
             pattern: '^[0-9]{9}$'
       responses:
         '200':
-          description: Succès
+          description: Liste des établissements
           content:
             application/json:
               schema:
@@ -29,97 +78,228 @@ paths:
                 items:
                   $ref: '#/components/schemas/Etablissement'
         '400':
-          description: En-tête SIREN manquant
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: SIREN header is required
+          description: En-tête SIREN requis (ou erreur de paramètre)
+        '401':
+          description: Non authentifié
 
-  /unites_legales:
+  /entreprises/siren/{siren}:
     get:
-      summary: Liste les unités légales
-      description: >
-        Récupère les unités légales.
-        **Attention :** Vous devez fournir soit le `siren`, soit le `company`, mais pas les deux simultanément.
+      summary: Récupérer une entreprise par SIREN
+      operationId: getEntrepriseBySiren
+      tags:
+        - Entreprises
+      security:
+        - bearerAuth: []
       parameters:
         - name: siren
-          in: header
-          required: false
+          in: path
+          required: true
           description: Le numéro SIREN (9 chiffres)
           schema:
             type: string
             pattern: '^[0-9]{9}$'
-        - name: company
-          in: header
-          required: false
-          description: Le nom de l'entreprise pour la recherche
-          schema:
-            type: string
-            pattern: '^[A-Za-zÀ-ÖØ-öø-ÿ \'-]{2,100}$'
       responses:
         '200':
-          description: Succès
+          description: Détails de l'entreprise
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UniteLegale'
+                  $ref: '#/components/schemas/Entreprise'
         '400':
-          description: Erreur de validation (Paramètres manquants ou mutuellement exclusifs)
+          description: SIREN requis
+        '401':
+          description: Non authentifié
+
+  /entreprises/search/{name}:
+    get:
+      summary: Rechercher des entreprises par nom
+      operationId: searchEntreprisesByName
+      tags:
+        - Entreprises
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Nom ou dénomination de l'entreprise
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 100
+      responses:
+        '200':
+          description: Liste des entreprises correspondantes
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Vous devez fournir soit le header 'siren', soit le header 'company', mais pas les deux."
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entreprise'
+        '401':
+          description: Non authentifié
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
   schemas:
+    Entreprise:
+      type: object
+      properties:
+        siren:
+          type: integer
+          example: 123456789
+        statutDiffusionUniteLegale:
+          type: string
+        unitePurgeeUniteLegale:
+          type: string
+          nullable: true
+        dateCreationUniteLegale:
+          type: string
+          format: date
+          nullable: true
+        sigleUniteLegale:
+          type: string
+          nullable: true
+        sexeUniteLegale:
+          type: string
+          nullable: true
+        prenom1UniteLegale:
+          type: string
+          nullable: true
+        prenom2UniteLegale:
+          type: string
+          nullable: true
+        prenom3UniteLegale:
+          type: string
+          nullable: true
+        prenom4UniteLegale:
+          type: string
+          nullable: true
+        prenomUsuelUniteLegale:
+          type: string
+          nullable: true
+        pseudonymeUniteLegale:
+          type: string
+          nullable: true
+        identifiantAssociationUniteLegale:
+          type: string
+          nullable: true
+        trancheEffectifsUniteLegale:
+          type: string
+        anneeEffectifsUniteLegale:
+          type: number
+          nullable: true
+        dateDernierTraitementUniteLegale:
+          type: string
+          format: date-time
+        nombrePeriodesUniteLegale:
+          type: integer
+        categorieEntreprise:
+          type: string
+          nullable: true
+        anneeCategorieEntreprise:
+          type: number
+          nullable: true
+        dateDebut:
+          type: string
+          format: date
+          nullable: true
+        etatAdministratifUniteLegale:
+          type: string
+        nomUniteLegale:
+          type: string
+          nullable: true
+        nomUsageUniteLegale:
+          type: string
+          nullable: true
+        denominationUniteLegale:
+          type: string
+          nullable: true
+        denominationUsuelle1UniteLegale:
+          type: string
+          nullable: true
+        denominationUsuelle2UniteLegale:
+          type: string
+          nullable: true
+        denominationUsuelle3UniteLegale:
+          type: string
+          nullable: true
+        categorieJuridiqueUniteLegale:
+          type: integer
+        activitePrincipaleUniteLegale:
+          type: string
+          nullable: true
+        nomenclatureActivitePrincipaleUniteLegale:
+          type: string
+          nullable: true
+        nicSiegeUniteLegale:
+          type: integer
+        economieSocialeSolidaireUniteLegale:
+          type: string
+          nullable: true
+        societeMissionUniteLegale:
+          type: string
+          nullable: true
+        caractereEmployeurUniteLegale:
+          type: number
+          nullable: true
+        activitePrincipaleNAF25UniteLegale:
+          type: string
+          nullable: true
+
     Etablissement:
       type: object
       properties:
-        id:
-          type: integer
         siren:
-          type: string
+          type: integer
         nic:
-          type: string
-        siret:
-          type: string
-        date_debut:
-          type: string
-          format: date
-        etat_administratif:
-          type: string
-        enseigne_1:
-          type: string
-        activite_principale:
-          type: string
-
-    UniteLegale:
-      type: object
-      properties:
-        id:
           type: integer
-        siren:
-          type: string
-        denomination_unite_legale:
-          type: string
-        nom_unite_legale:
-          type: string
-        prenom_1_unite_legale:
-          type: string
-        date_creation_unite_legale:
+        siret:
+          type: integer
+        dateFin:
           type: string
           format: date
-        categorie_entreprise:
+          nullable: true
+        dateDebut:
           type: string
-        activite_principale_unite_legale:
+          format: date
+          nullable: true
+        etatAdministratifEtablissement:
           type: string
+          nullable: true
+        changementEtatAdministratifEtablissement:
+          type: boolean
+        enseigne1Etablissement:
+          type: string
+          nullable: true
+        enseigne2Etablissement:
+          type: string
+          nullable: true
+        enseigne3Etablissement:
+          type: string
+          nullable: true
+        changementEnseigneEtablissement:
+          type: boolean
+        denominationUsuelleEtablissement:
+          type: string
+          nullable: true
+        changementDenominationUsuelleEtablissement:
+          type: boolean
+        activitePrincipaleEtablissement:
+          type: string
+          nullable: true
+        nomenclatureActivitePrincipaleEtablissement:
+          type: string
+          nullable: true
+        changementActivitePrincipaleEtablissement:
+          type: boolean
+        caractereEmployeurEtablissement:
+          type: string
+          nullable: true
+        changementCaractereEmployeurEtablissement:
+          type: boolean

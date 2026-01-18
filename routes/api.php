@@ -7,36 +7,25 @@
     use Illuminate\Support\Facades\Route;
     use Illuminate\Validation\ValidationException;
 
-    Route::post('/tokens/create', function (Request $request) {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-            'token_name' => 'required',
-        ]);
+    /*
+     * Tokens Endpoint
+     */
+    Route::post('tokens/create', [App\Http\Controllers\TokensController::class, 'store']);
 
-        $user = User::where('email', $request->email)->first();
+    /*
+     * Etablissements Endpoint
+     */
+    Route::get('etablissements/{siren}', [App\Http\Controllers\EtablissementsController::class, 'index'])
+        ->where('siren', '^[0-9]{9}$')
+        ->middleware(['auth:sanctum', 'abilities:check-status,get-establishments']);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Les identifiants fournis sont incorrects.'],
-            ]);
-        }
+    /*
+     * Entreprise Endpoint
+     */
+    Route::get('entreprises/siren/{siren}', [App\Http\Controllers\UnitesLegalesController::class, 'index'])
+        ->where('siren', '^[0-9]{9}$')
+        ->middleware(['auth:sanctum', 'abilities:check-status,get-legal-units']);
 
-        $token = $user->createToken($request->token_name,
-            [
-                'check-status',
-                'get-establishments',
-                'get-legal-units'
-            ]
-        );
-
-        return ['token' => $token->plainTextToken];
-    });
-
-    Route::apiResource('etablissements',
-        App\Http\Controllers\EtablissementsController::class
-    )->middleware(['auth:sanctum', 'abilities:check-status,get-establishments']);
-
-    Route::apiResource('unites_legales',
-        App\Http\Controllers\UnitesLegalesController::class
-    )->middleware(['auth:sanctum', 'abilities:check-status,get-legal-units']);
+    Route::get('entreprises/search/{name}', [App\Http\Controllers\UnitesLegalesController::class, 'index'])
+        ->where('name', "^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s'.,&-]{2,100}$")
+        ->middleware(['auth:sanctum', 'abilities:check-status,get-legal-units']);

@@ -9,13 +9,14 @@ class EtablissementsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
 
         $requestHistory = new \App\Models\RequestsHistory();
 
-        if(request()->header('siren')) {
-            $siren = request()->header('siren');
+        if (request()->route('siren')) {
+
+            $siren = request()->route('siren');
 
             $establishments = \App\Models\etablissementsHistorique::searchBySiren($siren);
 

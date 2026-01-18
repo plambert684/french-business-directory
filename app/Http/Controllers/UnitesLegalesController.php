@@ -11,23 +11,25 @@ class UnitesLegalesController extends Controller
      */
     public function index()
     {
-        if(request()->header('siren')) {
-            $siren = request()->header('siren');
+        if (request()->route('siren')) {
+            $siren = request()->route('siren');
 
             $legalUnits = \App\Models\unitesLegales::searchBySiren($siren);
 
             return response()->json($legalUnits);
 
-        } elseif (request()->header('company')) {
+        } elseif (request()->route('name')) {
 
-            $company = request()->header('company');
+            $company = request()->route('name');
 
             $legalUnits = \App\Models\unitesLegales::where('denomination_unite_legale', 'like', '%' . $company . '%')->get();
 
             return response()->json($legalUnits);
 
         } else {
-            return response()->json(['error' => 'Missing parameters header is required'], 400);
+
+            return response()->json(['error' => 'siren or company header is required'], 400);
+
         }
     }
 
