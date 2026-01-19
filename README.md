@@ -15,7 +15,7 @@ composer install
 Before creating the databases with docker, create a 'data_to_import' folder in the project root to store datasets to import:
 
 ```bashm
-kdir data_to_import
+mkdir data_to_import
 ```
 
 Put StockUniteLegale and StockEtablissementHistorique **csv** datasets from https://www.data.gouv.fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret in the 'data_to_import' folder.
