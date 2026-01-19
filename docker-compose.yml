@@ -9,9 +9,10 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: french_business_directory
     ports:
-      - "5434:5432"
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+      # Load initial data into the database
       - ./data_to_import:/container_data:ro
 
 volumes:

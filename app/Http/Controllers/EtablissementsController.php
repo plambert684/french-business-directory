@@ -45,17 +45,43 @@ class EtablissementsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $id)
     {
-        //
+        $requestHistory = new \App\Models\RequestsHistory();
+
+        if(request()->route('siret')) {
+
+            $siret = request()->route('siret');
+
+            $etablishment = \App\Models\etablissementsHistorique::searchBySiret($siret);
+
+            //Save request and response to history
+            $requestHistory->endpoint = request()->path();
+            $requestHistory->method = request()->method();
+            $requestHistory->ip_address = request()->ip();
+            $requestHistory->user_agent = request()->header('User-Agent');
+            $requestHistory->request_headers = json_encode(request()->headers->all());
+            $requestHistory->request_body = json_encode(request()->all());
+            $requestHistory->response_status = 200;
+            $requestHistory->response_body = $etablishment->toJson();
+            $requestHistory->user_id = auth()->check() ? auth()->id() : null;
+
+            $requestHistory->save();
+
+            return response()->json($etablishment);
+        } else {
+            return response()->json(['error' => 'SIRET parameter is required'], 400);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $siret)
     {
-        //
+        $etablishment = \App\Models\etablissementsHistorique::searchBySiret($siret);
+
+        return response()->json($etablishment);
     }
 
     /**

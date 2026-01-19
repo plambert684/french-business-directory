@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\TestCase;
 
 class TestHttpUnitesLegales extends TestCase
@@ -11,8 +13,14 @@ class TestHttpUnitesLegales extends TestCase
      */
     public function RunTest(): void
     {
-        $response = $this->get('/api/unites-legales', ['siren' => '123456789']);
+        Sanctum::actingAs(
+            User::factory()->create(),
+            ['check-status', 'get-legal-units']
+        );
+
+        $response = $this->getJson('/api/entreprises/siren/433115904');
 
         $response->assertStatus(200);
+
     }
 }
