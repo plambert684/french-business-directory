@@ -34,4 +34,9 @@ class etablissementsHistorique extends Model
     {
         return self::where('siren', $siren)->get();
     }
+
+    public static function searchBySiret($siret)
+    {
+        return self::where('siret', $siret)->first();
+    }
 }
