@@ -142,6 +142,3 @@ Or start the application manually:
 ```bash
 php artisan serve
 ```
-
-## Import datasets
-
