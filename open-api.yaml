@@ -82,6 +82,34 @@ paths:
         '401':
           description: Non authentifié
 
+  /etablissements/siret/{siret}:
+    get:
+      summary: Récupérer un établissement par SIRET
+      operationId: getEtablissementBySiret
+      tags:
+        - Etablissements
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: siret
+          in: path
+          required: true
+          description: Le numéro SIRET (14 chiffres)
+          schema:
+            type: string
+            pattern: '^[0-9]{14}$'
+      responses:
+        '200':
+          description: Détails de l'établissement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Etablissement'
+        '400':
+          description: SIRET requis
+        '401':
+          description: Non authentifié
+
   /entreprises/siren/{siren}:
     get:
       summary: Récupérer une entreprise par SIREN
