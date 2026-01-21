@@ -52,7 +52,7 @@ paths:
         '422':
           description: Erreur de validation
 
-  /etablissements/{siren}:
+  /etablissements/siren/{siren}:
     get:
       summary: Liste des établissements par SIREN
       operationId: getEtablissementsBySiren
@@ -140,7 +140,7 @@ paths:
         '401':
           description: Non authentifié
 
-  /entreprises/search/{name}:
+  /entreprises/name/{name}:
     get:
       summary: Rechercher des entreprises par nom
       operationId: searchEntreprisesByName
